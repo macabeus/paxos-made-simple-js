@@ -33,11 +33,11 @@ export const WorkersTable = ({ workers }: Props) => {
         </Box>
 
         <Box width="20%">
-          <Text bold>Proposal Promises Received</Text>
+          <Text bold>Promises Received / Minimum Quorum</Text>
         </Box>
 
         <Box width="20%">
-          <Text bold>Accepts Received</Text>
+          <Text bold>Accepts Received / MQ</Text>
         </Box>
       </Box>
 
@@ -69,10 +69,14 @@ export const WorkersTable = ({ workers }: Props) => {
 
           <Box width="20%">
             <ColoredText value={worker.proposalPromisesReceived} />
+            <Text>/</Text>
+            <ColoredText value={worker.minimumQuorum} />
           </Box>
 
           <Box width="20%">
             <ColoredText value={worker.acceptsReceived} />
+            <Text>/</Text>
+            <ColoredText value={worker.minimumQuorum} />
           </Box>
         </Box>
       ))}

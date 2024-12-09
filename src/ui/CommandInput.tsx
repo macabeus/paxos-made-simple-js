@@ -5,7 +5,8 @@ export type ParsedCommand =
   | { action: "invalid"; reason: string }
   | { action: "quit" }
   | { action: "help" }
-  | { action: "propose"; worker: string; value: string };
+  | { action: "propose"; worker: string; value: string }
+  | { action: "add-worker"; id: string };
 
 const commandParser = (raw: string): ParsedCommand => {
   const parts = raw.split(" ");
@@ -28,6 +29,18 @@ const commandParser = (raw: string): ParsedCommand => {
     }
 
     return { action: "propose", worker: parts[1], value: parts[2] };
+  }
+
+  if (parts[0] === "a" || parts[0] === "add-worker") {
+    if (parts.length !== 2) {
+      return {
+        action: "invalid",
+        reason:
+          '"add-worker" command needs exactly one parameter: `add-worker workerId`',
+      };
+    }
+
+    return { action: "add-worker", id: parts[1] };
   }
 
   return { action: "invalid", reason: `Input "${raw}" is not a valid command` };

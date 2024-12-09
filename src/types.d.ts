@@ -6,6 +6,7 @@ type WorkerState = {
   proposingId: string | null;
   proposingValue: string | null;
   proposalPromisesReceived: number;
+  minimumQuorum: number;
   acceptsReceived: 0;
 };
 

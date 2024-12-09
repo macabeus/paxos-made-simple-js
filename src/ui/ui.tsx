@@ -1,8 +1,8 @@
 import { Worker } from "node:worker_threads";
-import { useEffect } from "react";
+import { Dispatch, useEffect } from "react";
 import { render, Box } from "ink";
 import { useImmerReducer } from "use-immer";
-import { workers } from "../constants.cjs";
+import { defaultWorkers } from "../constants.cjs";
 import { CommandInput, ParsedCommand } from "./CommandInput";
 import { Logs } from "./Logs";
 import { WorkersTable } from "./WorkersTable";
@@ -36,6 +36,7 @@ function reducer(state: UIState, action: WorkersActions) {
         proposingId: null,
         proposingValue: null,
         proposalPromisesReceived: 0,
+        minimumQuorum: 0,
         acceptsReceived: 0,
       });
       return;
@@ -87,51 +88,56 @@ function reducer(state: UIState, action: WorkersActions) {
 
 const workerPool: Record<string, Worker> = {};
 
+const startWorker = (
+  id: string,
+  type: "default" | "custom",
+  initialTotalWorkers: number,
+  dispatchUIState: Dispatch<WorkersActions>
+) => {
+  const worker = new Worker("./src/worker/worker.cjs", {
+    workerData: { id, type, initialTotalWorkers },
+  });
+
+  worker.on("message", (message) => {
+    dispatchUIState(message);
+  });
+
+  worker.on("error", (error) => {
+    dispatchUIState({
+      type: "addLog",
+      payload: {
+        log: `Error message from worker "${id}": ${error}`,
+        color: "red",
+      },
+    });
+  });
+
+  worker.on("exit", (code) => {
+    if (code !== 0) {
+      dispatchUIState({
+        type: "addLog",
+        payload: {
+          log: `Worker "${id}" exited with error ${code}`,
+          color: "red",
+        },
+      });
+    } else {
+      dispatchUIState({
+        type: "addLog",
+        payload: { log: `Worker "${id}" exited with no error` },
+      });
+    }
+  });
+
+  workerPool[id] = worker;
+};
+
 const Counter = () => {
   const [uiState, dispatchUIState] = useImmerReducer(reducer, defaultUIState);
 
   useEffect(() => {
-    const runWorker = (id: string) => {
-      const worker = new Worker("./src/worker/worker.cjs", {
-        workerData: { id },
-      });
-
-      worker.on("message", (message) => {
-        dispatchUIState(message);
-      });
-
-      worker.on("error", (error) => {
-        dispatchUIState({
-          type: "addLog",
-          payload: {
-            log: `Error message from worker "${id}": ${error}`,
-            color: "red",
-          },
-        });
-      });
-
-      worker.on("exit", (code) => {
-        if (code !== 0) {
-          dispatchUIState({
-            type: "addLog",
-            payload: {
-              log: `Worker "${id}" exited with error ${code}`,
-              color: "red",
-            },
-          });
-        } else {
-          dispatchUIState({
-            type: "addLog",
-            payload: { log: `Worker "${id}" exited with no error` },
-          });
-        }
-      });
-
-      workerPool[id] = worker;
-    };
-
-    for (const { id } of workers) {
-      runWorker(id);
+    for (const { id } of defaultWorkers) {
+      startWorker(id, "default", defaultWorkers.length, dispatchUIState);
     }
   }, []);
 
@@ -148,6 +154,18 @@ const Counter = () => {
             value: command.value,
           },
         });
+
+        return;
+      }
+
+      case "add-worker": {
+        startWorker(
+          command.id,
+          "custom",
+          uiState.workers.length + 1,
+          dispatchUIState
+        );
+
         return;
       }
 
@@ -157,7 +175,8 @@ const Counter = () => {
           payload: {
             logs: [
               "Available commands:",
-              "- `proposal <worker id> <value>`: send a proposal request from <worker id> with <value>",
+              "- `proposal <worker id> <value>`: send a proposal request",
+              "- `add-worker <worker id>`: add a new worker",
               "- `quit`: quit the program",
             ],
           },
@@ -171,6 +190,7 @@ const Counter = () => {
           type: "addLog",
           payload: { log: command.reason, color: "yellow" },
         });
+
         return;
       }
     }

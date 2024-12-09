@@ -1,5 +1,4 @@
 const { workerData } = require("node:worker_threads");
-const { workers } = require("../constants.cjs");
 const {
   broadcast,
   addBroadcastHandler,
@@ -8,15 +7,14 @@ const {
   addWorkerMessageHandler,
 } = require("./message.cjs");
 
-const { id } = workerData;
-
-const proposalMinimumQuorum = Math.floor(workers.length / 2);
+const { id, type, initialTotalWorkers } = workerData;
 
 const state = new Proxy(
   {
     status: "idle",
     highestProposalId: 0,
     acceptedValue: null,
+    minimumQuorum: 0,
 
     proposingId: null,
     proposingValue: null,
@@ -74,7 +72,7 @@ addWorkerMessageHandler("proposalPromised", async (payload) => {
   ) {
     state.proposalPromisesReceived += 1;
 
-    if (state.proposalPromisesReceived <= proposalMinimumQuorum) {
+    if (state.proposalPromisesReceived >= state.minimumQuorum) {
       state.status = "sendingAccepts";
 
       broadcast("acceptResponse", {
@@ -92,7 +90,7 @@ addWorkerMessageHandler("acceptConfirmed", async (payload) => {
   ) {
     state.acceptsReceived += 1;
 
-    if (state.acceptsReceived <= proposalMinimumQuorum) {
+    if (state.acceptsReceived >= state.minimumQuorum) {
       state.status = "idle";
       state.highestProposalId = state.proposingId;
       state.acceptedValue = state.proposingValue;
@@ -103,3 +101,18 @@ addWorkerMessageHandler("acceptConfirmed", async (payload) => {
 });
 
 sendMessageToUIThread("workerConnected", { id });
+
+// count minimum quorum
+let totalWorkers = initialTotalWorkers;
+
+addBroadcastHandler("newWorker", () => {
+  totalWorkers += 1;
+  state.minimumQuorum = Math.floor(totalWorkers / 2);
+});
+
+state.minimumQuorum = Math.floor(totalWorkers / 2);
+
+// if this worker was created by the user, we need to announce it to the other workers
+if (type === "custom") {
+  broadcast("newWorker", {});
+}
