@@ -40,6 +40,7 @@ addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
 
   if (state.highestProposalId < payload.proposalId) {
     state.status = "promiseSent";
+    state.highestProposalId = payload.proposalId;
 
     sendResponse("proposalPromised", {
       proposalId: payload.proposalId,
@@ -59,7 +60,6 @@ addBroadcastHandler("acceptResponse", async (payload, { sendResponse }) => {
 
   state.status = "idle";
   state.acceptedValue = payload.acceptedValue;
-  state.highestProposalId = payload.proposalId;
 
   sendResponse("acceptConfirmed", {
     proposalId: payload.proposalId,
