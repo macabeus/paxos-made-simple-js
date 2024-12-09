@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "strict": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "sourceMap": true,
+    "outDir": "dist",
+    "jsx": "react-jsx"
+  }
+}
+

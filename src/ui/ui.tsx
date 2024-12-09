@@ -1,0 +1,197 @@
+import { Worker } from "node:worker_threads";
+import { useEffect } from "react";
+import { render, Box } from "ink";
+import { useImmerReducer } from "use-immer";
+import { workers } from "../constants.cjs";
+import { CommandInput, ParsedCommand } from "./CommandInput";
+import { Logs } from "./Logs";
+import { WorkersTable } from "./WorkersTable";
+
+type UIState = {
+  workers: WorkerState[];
+  logs: LogEntry[];
+};
+type WorkersActions =
+  | { type: "workerConnected"; payload: { id: string } }
+  | {
+      type: "workerStateChanged";
+      payload: { id: string; prop: string; value: string };
+    }
+  | { type: "addLog"; payload: { log: string; color?: string } }
+  | { type: "addLogs"; payload: { logs: string[]; color?: string } };
+
+const defaultUIState: UIState = {
+  workers: [],
+  logs: [],
+};
+
+function reducer(state: UIState, action: WorkersActions) {
+  switch (action.type) {
+    case "workerConnected": {
+      state.workers.push({
+        id: action.payload.id,
+        status: "idle",
+        highestProposalId: 0,
+        acceptedValue: null,
+        proposingId: null,
+        proposingValue: null,
+        proposalPromisesReceived: 0,
+        acceptsReceived: 0,
+      });
+      return;
+    }
+
+    case "workerStateChanged": {
+      const worker = state.workers.find(
+        (worker) => worker.id === action.payload.id
+      ) as any;
+
+      if (worker[action.payload.prop] === action.payload.value) {
+        return;
+      }
+
+      state.logs.push({
+        type: "workerStatusChanged",
+        payload: {
+          workerId: worker.id,
+          prop: action.payload.prop,
+          previousValue: worker[action.payload.prop],
+          newValue: action.payload.value,
+        },
+      });
+
+      worker[action.payload.prop] = action.payload.value;
+
+      return;
+    }
+
+    case "addLog": {
+      state.logs.push({
+        type: "raw",
+        payload: { value: action.payload.log, color: action.payload.color },
+      });
+
+      return;
+    }
+
+    case "addLogs": {
+      state.logs.push(
+        ...action.payload.logs.map((value) => ({
+          type: "raw" as const,
+          payload: { value, color: action.payload.color },
+        }))
+      );
+    }
+  }
+}
+
+const workerPool: Record<string, Worker> = {};
+
+const Counter = () => {
+  const [uiState, dispatchUIState] = useImmerReducer(reducer, defaultUIState);
+
+  useEffect(() => {
+    const runWorker = (id: string) => {
+      const worker = new Worker("./src/worker/worker.cjs", {
+        workerData: { id },
+      });
+
+      worker.on("message", (message) => {
+        dispatchUIState(message);
+      });
+
+      worker.on("error", (error) => {
+        dispatchUIState({
+          type: "addLog",
+          payload: {
+            log: `Error message from worker "${id}": ${error}`,
+            color: "red",
+          },
+        });
+      });
+
+      worker.on("exit", (code) => {
+        if (code !== 0) {
+          dispatchUIState({
+            type: "addLog",
+            payload: {
+              log: `Worker "${id}" exited with error ${code}`,
+              color: "red",
+            },
+          });
+        } else {
+          dispatchUIState({
+            type: "addLog",
+            payload: { log: `Worker "${id}" exited with no error` },
+          });
+        }
+      });
+
+      workerPool[id] = worker;
+    };
+
+    for (const { id } of workers) {
+      runWorker(id);
+    }
+  }, []);
+
+  const onSubmitCommand = (command: ParsedCommand) => {
+    switch (command.action) {
+      case "quit": {
+        process.exit();
+      }
+
+      case "propose": {
+        workerPool[command.worker].postMessage({
+          type: "propose",
+          payload: {
+            value: command.value,
+          },
+        });
+        return;
+      }
+
+      case "help": {
+        dispatchUIState({
+          type: "addLogs",
+          payload: {
+            logs: [
+              "Available commands:",
+              "- `proposal <worker id> <value>`: send a proposal request from <worker id> with <value>",
+              "- `quit`: quit the program",
+            ],
+          },
+        });
+
+        return;
+      }
+
+      case "invalid": {
+        dispatchUIState({
+          type: "addLog",
+          payload: { log: command.reason, color: "yellow" },
+        });
+        return;
+      }
+    }
+  };
+
+  return (
+    <Box flexDirection="column" width={200}>
+      <WorkersTable workers={uiState.workers} />
+
+      <Logs logs={uiState.logs} />
+
+      <CommandInput onSubmit={onSubmitCommand} />
+    </Box>
+  );
+};
+
+const enterAltScreenCommand = "\x1b[?1049h";
+const leaveAltScreenCommand = "\x1b[?1049l";
+process.stdout.write(enterAltScreenCommand);
+process.on("exit", () => {
+  process.stdout.write(leaveAltScreenCommand);
+});
+
+render(<Counter />);
