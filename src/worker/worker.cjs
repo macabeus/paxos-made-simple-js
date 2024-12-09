@@ -34,16 +34,29 @@ const state = new Proxy(
 );
 
 addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
+  if (state.status === "off") {
+    return;
+  }
+
   if (state.highestProposalId < payload.proposalId) {
     state.status = "promiseSent";
 
     sendResponse("proposalPromised", {
       proposalId: payload.proposalId,
     });
+  } else {
+    sendResponse("overwriteProposer", {
+      highestProposalId: state.highestProposalId,
+      acceptedValue: state.acceptedValue,
+    });
   }
 });
 
 addBroadcastHandler("acceptResponse", async (payload, { sendResponse }) => {
+  if (state.status === "off") {
+    return;
+  }
+
   state.status = "idle";
   state.acceptedValue = payload.acceptedValue;
   state.highestProposalId = payload.proposalId;
@@ -65,6 +78,14 @@ addUiMessageHandler("propose", async (payload) => {
   });
 });
 
+addUiMessageHandler("off", async () => {
+  state.status = "off";
+});
+
+addUiMessageHandler("on", async () => {
+  state.status = "idle";
+});
+
 addWorkerMessageHandler("proposalPromised", async (payload) => {
   if (
     state.status === "proposing" &&
@@ -81,6 +102,14 @@ addWorkerMessageHandler("proposalPromised", async (payload) => {
       });
     }
   }
+});
+
+addWorkerMessageHandler("overwriteProposer", (payload) => {
+  state.status = "idle";
+  state.proposingId = null;
+  state.proposingValue = null;
+  state.highestProposalId = payload.highestProposalId;
+  state.acceptedValue = payload.acceptedValue;
 });
 
 addWorkerMessageHandler("acceptConfirmed", async (payload) => {

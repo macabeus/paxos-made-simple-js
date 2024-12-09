@@ -169,6 +169,18 @@ const Counter = () => {
         return;
       }
 
+      case "off": {
+        workerPool[command.id].postMessage({ type: "off" });
+
+        return;
+      }
+
+      case "on": {
+        workerPool[command.id].postMessage({ type: "on" });
+
+        return;
+      }
+
       case "help": {
         dispatchUIState({
           type: "addLogs",
@@ -177,6 +189,8 @@ const Counter = () => {
               "Available commands:",
               "- `proposal <worker id> <value>`: send a proposal request",
               "- `add-worker <worker id>`: add a new worker",
+              "- `off <worker id>`: turn off a worker",
+              "- `on <worker id>`: turn on a worker",
               "- `quit`: quit the program",
             ],
           },
