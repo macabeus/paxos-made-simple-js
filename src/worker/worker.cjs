@@ -38,19 +38,36 @@ addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
     return;
   }
 
-  if (state.highestProposalId < payload.proposalId) {
-    state.status = "promiseSent";
-    state.highestProposalId = payload.proposalId;
-
-    sendResponse("proposalPromised", {
-      proposalId: payload.proposalId,
-    });
-  } else {
+  const proposedValueIdIsOld = state.highestProposalId > payload.proposalId;
+  if (proposedValueIdIsOld) {
     sendResponse("overwriteProposer", {
+      proposerId: id,
       highestProposalId: state.highestProposalId,
       acceptedValue: state.acceptedValue,
     });
+    return;
   }
+
+  if (state.status === "proposing") {
+    const proposerHasLowerIdThanMine = id.localeCompare(payload.proposerId) < 0;
+
+    if (proposerHasLowerIdThanMine) {
+      sendResponse("overwriteProposer", {
+        proposerId: payload.proposerId,
+        highestProposalId: state.proposingId,
+        acceptedValue: state.proposingValue,
+      });
+    }
+
+    return;
+  }
+
+  state.status = "promiseSent";
+  state.highestProposalId = payload.proposalId;
+
+  sendResponse("proposalPromised", {
+    proposalId: payload.proposalId,
+  });
 });
 
 addBroadcastHandler("acceptResponse", async (payload, { sendResponse }) => {
@@ -73,6 +90,7 @@ addUiMessageHandler("propose", async (payload) => {
   state.proposingValue = payload.value;
 
   broadcast("proposingValue", {
+    proposerId: id,
     proposalId: state.proposingId,
     proposalValue: state.proposingValue,
   });
@@ -105,11 +123,15 @@ addWorkerMessageHandler("proposalPromised", async (payload) => {
 });
 
 addWorkerMessageHandler("overwriteProposer", (payload) => {
-  state.status = "idle";
-  state.proposingId = null;
-  state.proposingValue = null;
-  state.highestProposalId = payload.highestProposalId;
-  state.acceptedValue = payload.acceptedValue;
+  state.status = "proposing";
+  state.proposingId = payload.highestProposalId;
+  state.proposingValue = payload.acceptedValue;
+
+  broadcast("proposingValue", {
+    proposerId: payload.proposerId,
+    proposalId: payload.highestProposalId,
+    proposalValue: payload.acceptedValue,
+  });
 });
 
 addWorkerMessageHandler("acceptConfirmed", async (payload) => {
