@@ -70,8 +70,23 @@ const commandParser = (raw: string): ParsedCommand => {
   return { action: "invalid", reason: `Input "${raw}" is not a valid command` };
 };
 
+const commandParserMultiples = (raw: string): ParsedCommand[] => {
+  const rawParts = raw.split(/;\s*/);
+
+  const parsedCommands = rawParts.map((raw) => commandParser(raw));
+
+  const includeInvalidCommand = parsedCommands.find(
+    (command) => command.action === "invalid"
+  );
+  if (includeInvalidCommand) {
+    return [includeInvalidCommand];
+  }
+
+  return parsedCommands;
+};
+
 type Props = {
-  onSubmit: (command: ParsedCommand) => void;
+  onSubmit: (commands: ParsedCommand[]) => void;
 };
 
 export const CommandInput = ({ onSubmit }: Props) => {
@@ -83,7 +98,7 @@ export const CommandInput = ({ onSubmit }: Props) => {
     } else if (key.return) {
       setInputValue("");
 
-      const parsedCommand = commandParser(inputValue);
+      const parsedCommand = commandParserMultiples(inputValue);
       onSubmit(parsedCommand);
     } else {
       setInputValue(`${inputValue}${input}`);

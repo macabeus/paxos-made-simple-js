@@ -141,71 +141,74 @@ const Counter = () => {
     }
   }, []);
 
-  const onSubmitCommand = (command: ParsedCommand) => {
-    switch (command.action) {
-      case "quit": {
-        process.exit();
-      }
+  const onSubmitCommand = (commands: ParsedCommand[]) => {
+    for (const command of commands) {
+      switch (command.action) {
+        case "quit": {
+          process.exit();
+        }
 
-      case "propose": {
-        workerPool[command.worker].postMessage({
-          type: "propose",
-          payload: {
-            value: command.value,
-          },
-        });
+        case "propose": {
+          workerPool[command.worker].postMessage({
+            type: "propose",
+            payload: {
+              value: command.value,
+            },
+          });
 
-        return;
-      }
+          break;
+        }
 
-      case "add-worker": {
-        startWorker(
-          command.id,
-          "custom",
-          uiState.workers.length + 1,
-          dispatchUIState
-        );
+        case "add-worker": {
+          startWorker(
+            command.id,
+            "custom",
+            uiState.workers.length + 1,
+            dispatchUIState
+          );
 
-        return;
-      }
+          break;
+        }
 
-      case "off": {
-        workerPool[command.id].postMessage({ type: "off" });
+        case "off": {
+          workerPool[command.id].postMessage({ type: "off" });
 
-        return;
-      }
+          break;
+        }
 
-      case "on": {
-        workerPool[command.id].postMessage({ type: "on" });
+        case "on": {
+          workerPool[command.id].postMessage({ type: "on" });
 
-        return;
-      }
+          break;
+        }
 
-      case "help": {
-        dispatchUIState({
-          type: "addLogs",
-          payload: {
-            logs: [
-              "Available commands:",
-              "- `proposal <worker id> <value>`: send a proposal request",
-              "- `add-worker <worker id>`: add a new worker",
-              "- `off <worker id>`: turn off a worker",
-              "- `on <worker id>`: turn on a worker",
-              "- `quit`: quit the program",
-            ],
-          },
-        });
+        case "help": {
+          dispatchUIState({
+            type: "addLogs",
+            payload: {
+              logs: [
+                "Available commands:",
+                "- `proposal <worker id> <value>`: send a proposal request",
+                "- `add-worker <worker id>`: add a new worker",
+                "- `off <worker id>`: turn off a worker",
+                "- `on <worker id>`: turn on a worker",
+                "- `quit`: quit the program",
+                "Tip: Run multiple commands at once by splitting them with `;`",
+              ],
+            },
+          });
 
-        return;
-      }
+          break;
+        }
 
-      case "invalid": {
-        dispatchUIState({
-          type: "addLog",
-          payload: { log: command.reason, color: "yellow" },
-        });
+        case "invalid": {
+          dispatchUIState({
+            type: "addLog",
+            payload: { log: command.reason, color: "yellow" },
+          });
 
-        return;
+          break;
+        }
       }
     }
   };
