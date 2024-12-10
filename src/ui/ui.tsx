@@ -31,7 +31,7 @@ function reducer(state: UIState, action: WorkersActions) {
       state.workers.push({
         id: action.payload.id,
         status: "idle",
-        highestProposalId: 0,
+        highestProposalId: `${action.payload.id}:0`,
         acceptedValue: null,
         proposingId: null,
         proposingValue: null,

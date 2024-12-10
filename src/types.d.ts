@@ -1,7 +1,7 @@
 type WorkerState = {
   id: string;
   status: "idle";
-  highestProposalId: 0;
+  highestProposalId: string;
   acceptedValue: string | null;
   proposingId: string | null;
   proposingValue: string | null;
