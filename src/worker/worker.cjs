@@ -77,6 +77,8 @@ addBroadcastHandler("acceptResponse", async (payload, { sendResponse }) => {
 
   state.status = "idle";
   state.acceptedValue = payload.acceptedValue;
+  state.proposingId = null;
+  state.proposingValue = null;
 
   sendResponse("acceptConfirmed", {
     proposalId: payload.proposalId,
@@ -86,6 +88,7 @@ addBroadcastHandler("acceptResponse", async (payload, { sendResponse }) => {
 addUiMessageHandler("propose", async (payload) => {
   state.status = "proposing";
   state.proposalPromisesReceived = 0;
+  state.acceptsReceived = 0;
   state.proposingId = state.highestProposalId + 1;
   state.proposingValue = payload.value;
 
