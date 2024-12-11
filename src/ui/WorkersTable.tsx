@@ -8,11 +8,11 @@ export const WorkersTable = ({ workers }: Props) => {
   return (
     <Box flexDirection="column" width={200} height={10}>
       <Box>
-        <Box width="10%">
+        <Box width="7%">
           <Text bold>ID</Text>
         </Box>
 
-        <Box width="10%">
+        <Box width="9%">
           <Text bold>Status</Text>
         </Box>
 
@@ -20,20 +20,24 @@ export const WorkersTable = ({ workers }: Props) => {
           <Text bold>Accepted Value</Text>
         </Box>
 
-        <Box width="15%">
-          <Text bold>Highest Proposal Id</Text>
+        <Box width="12%">
+          <Text bold>Highest Accepted Id</Text>
+        </Box>
+
+        <Box width="12%">
+          <Text bold>Highest Promise Id</Text>
         </Box>
 
         <Box width="10%">
           <Text bold>Proposing Id</Text>
         </Box>
 
-        <Box width="15%">
+        <Box width="10%">
           <Text bold>Proposing Value</Text>
         </Box>
 
-        <Box width="20%">
-          <Text bold>Promises Received / Minimum Quorum</Text>
+        <Box width="19%">
+          <Text bold>Promises Received / Min. Quorum</Text>
         </Box>
 
         <Box width="20%">
@@ -43,11 +47,11 @@ export const WorkersTable = ({ workers }: Props) => {
 
       {workers.map((worker) => (
         <Box key={worker.id}>
-          <Box width="10%">
+          <Box width="7%">
             <Text color="blue">{worker.id}</Text>
           </Box>
 
-          <Box width="10%">
+          <Box width="9%">
             <Text>{worker.status}</Text>
           </Box>
 
@@ -55,19 +59,23 @@ export const WorkersTable = ({ workers }: Props) => {
             <ColoredText value={worker.acceptedValue} />
           </Box>
 
-          <Box width="15%">
-            <ColoredText value={worker.highestProposalId} />
+          <Box width="12%">
+            <ColoredText value={worker.highestAcceptedId} />
+          </Box>
+
+          <Box width="12%">
+            <ColoredText value={worker.highestPromiseId} />
           </Box>
 
           <Box width="10%">
             <ColoredText value={worker.proposingId} />
           </Box>
 
-          <Box width="15%">
+          <Box width="10%">
             <ColoredText value={worker.proposingValue} />
           </Box>
 
-          <Box width="20%">
+          <Box width="19%">
             <ColoredText value={worker.proposalPromisesReceived} />
             <Text>/</Text>
             <ColoredText value={worker.minimumQuorum} />

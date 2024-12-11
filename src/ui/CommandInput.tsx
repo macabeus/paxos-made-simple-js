@@ -7,6 +7,7 @@ export type ParsedCommand =
   | { action: "help" }
   | { action: "propose"; worker: string; value: string }
   | { action: "add-worker"; id: string }
+  | { action: "delay"; miliseconds: number }
   | { action: "off"; id: string }
   | { action: "on"; id: string };
 
@@ -43,6 +44,18 @@ const commandParser = (raw: string): ParsedCommand => {
     }
 
     return { action: "add-worker", id: parts[1] };
+  }
+
+  if (parts[0] === "d" || parts[0] === "delay") {
+    if (parts.length !== 2) {
+      return {
+        action: "invalid",
+        reason:
+          '"delay" command needs exactly one parameter: `delay miliseconds`',
+      };
+    }
+
+    return { action: "delay", miliseconds: Number(parts[1]) };
   }
 
   if (parts[0] === "off") {

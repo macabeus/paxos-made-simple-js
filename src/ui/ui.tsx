@@ -6,6 +6,7 @@ import { defaultWorkers } from "../constants.cjs";
 import { CommandInput, ParsedCommand } from "./CommandInput";
 import { Logs } from "./Logs";
 import { WorkersTable } from "./WorkersTable";
+import { delay } from "./helpers";
 
 type UIState = {
   workers: WorkerState[];
@@ -142,7 +143,7 @@ const Counter = () => {
     }
   }, []);
 
-  const onSubmitCommand = (commands: ParsedCommand[]) => {
+  const onSubmitCommand = async (commands: ParsedCommand[]) => {
     for (const command of commands) {
       switch (command.action) {
         case "quit": {
@@ -171,6 +172,12 @@ const Counter = () => {
           break;
         }
 
+        case "delay": {
+          await delay(command.miliseconds);
+
+          break;
+        }
+
         case "off": {
           workerPool[command.id].postMessage({ type: "off" });
 
@@ -192,6 +199,7 @@ const Counter = () => {
                 "- `proposal <worker id> <value>`: send a proposal request",
                 "- `add-worker <worker id>`: add a new worker",
                 "- `off <worker id>`: turn off a worker",
+                "- `delay <miliseconds>`: wait for a time before running the next command",
                 "- `on <worker id>`: turn on a worker",
                 "- `quit`: quit the program",
                 "Tip: Run multiple commands at once by splitting them with `;`",
