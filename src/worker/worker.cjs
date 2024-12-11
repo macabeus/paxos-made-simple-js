@@ -95,12 +95,16 @@ addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
 
     // ...and my priority is higher...
     if (myIdIsHigherThanTheNewProposal) {
-      // ...then the proposer need to be overthrown
+      // ...then the proposer need to be overthrown...
       sendResponse("overwriteProposer", {
         proposerId: payload.proposerId,
         highestProposalId: state.proposingId,
         acceptedValue: state.proposingValue,
       });
+
+      // ...and it counts as a promise and accept accepted
+      state.proposalPromisesReceived += 1;
+      state.acceptsReceived += 1;
 
       return;
     } else {
