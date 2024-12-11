@@ -5,6 +5,8 @@ type Props = {
   workers: WorkerState[];
 };
 export const WorkersTable = ({ workers }: Props) => {
+  const sortedWorkers = workers.toSorted((a, b) => a.id.localeCompare(b.id));
+
   return (
     <Box flexDirection="column" width={200} height={10}>
       <Box>
@@ -45,7 +47,7 @@ export const WorkersTable = ({ workers }: Props) => {
         </Box>
       </Box>
 
-      {workers.map((worker) => (
+      {sortedWorkers.map((worker) => (
         <Box key={worker.id}>
           <Box width="7%">
             <Text color="blue">{worker.id}</Text>
