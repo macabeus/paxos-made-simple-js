@@ -9,6 +9,7 @@ const {
 const {
   getNextProposalId,
   proposalIdIsHigherThan,
+  proposalIdHasSameIndex,
 } = require("./proposalId.cjs");
 
 const { id, type, initialTotalWorkers } = workerData;
@@ -16,9 +17,11 @@ const { id, type, initialTotalWorkers } = workerData;
 const state = new Proxy(
   {
     status: "idle",
-    highestProposalId: `${id}:0`,
     acceptedValue: null,
     minimumQuorum: 0,
+
+    highestAcceptedId: `${id}:0`,
+    highestPromiseId: null,
 
     proposingId: null,
     proposingValue: null,
@@ -42,15 +45,43 @@ addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
     return;
   }
 
-  // if the proposed id is lower than the current one, the proposer might be outdated and needs to be updated with the latest status
-  const proposedIdIsHigher = proposalIdIsHigherThan(
-    payload.proposalId,
-    state.highestProposalId
-  );
-  if (!proposedIdIsHigher) {
+  // if the proposed value is the same of the current one, accept anyway
+  if (state.acceptedValue === payload.proposalValue) {
+    state.status = "promiseSent";
+    state.highestPromiseId = payload.proposalId;
+
+    sendResponse("proposalPromised", {
+      proposalId: payload.proposalId,
+      proposalValue: payload.proposalValue,
+    });
+
+    return;
+  }
+
+  // if the proposed id is lower than the current one, or the proposed index is the same as the approved one,
+  // then the proposer might be outdated and needs to be updated with the latest status
+  const idLowerThanAccepted =
+    !proposalIdIsHigherThan(payload.proposalId, state.highestAcceptedId) ||
+    proposalIdHasSameIndex(payload.proposalId, state.highestAcceptedId);
+  if (idLowerThanAccepted) {
     sendResponse("overwriteProposer", {
       proposerId: id,
-      highestProposalId: state.highestProposalId,
+      highestProposalId: state.highestAcceptedId,
+      acceptedValue: state.acceptedValue,
+    });
+
+    return;
+  }
+
+  // if the proposed id is lower than the promised one,
+  // then the proposer might be outdated and needs to be updated with the latest status
+  const idLowerThanPromised =
+    payload.highestPromiseId &&
+    !proposalIdIsHigherThan(payload.proposalId, state.highestPromiseId);
+  if (idLowerThanPromised) {
+    sendResponse("overwriteProposer", {
+      proposerId: id,
+      highestProposalId: state.highestPromiseId,
       acceptedValue: state.acceptedValue,
     });
 
@@ -78,9 +109,9 @@ addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
     }
   }
 
-  //
+  // accept the proposal
   state.status = "promiseSent";
-  state.highestProposalId = payload.proposalId;
+  state.highestPromiseId = payload.proposalId;
 
   sendResponse("proposalPromised", {
     proposalId: payload.proposalId,
@@ -93,18 +124,21 @@ addBroadcastHandler("acceptResponse", async (payload, { sendResponse }) => {
     return;
   }
 
+  // if this worker is already proposing and with a id higher tha the accepted one,
+  // then it should only ignore the message
   if (
     (state.status === "proposing" || state.status === "sendingAccepts") &&
-    state.proposingId === payload.proposalId &&
-    id.localeCompare(payload.proposerId) < 0
+    proposalIdIsHigherThan(state.proposingId, payload.proposalId)
   ) {
     return;
   }
 
   state.status = "idle";
   state.acceptedValue = payload.acceptedValue;
+  state.highestAcceptedId = payload.proposalId;
   state.proposingId = null;
   state.proposingValue = null;
+  state.highestPromiseId = null;
 
   sendResponse("acceptConfirmed", {
     proposalId: payload.proposalId,
@@ -115,7 +149,7 @@ addUiMessageHandler("propose", async (payload) => {
   state.status = "proposing";
   state.proposalPromisesReceived = 0;
   state.acceptsReceived = 0;
-  state.proposingId = getNextProposalId(state.highestProposalId);
+  state.proposingId = getNextProposalId(state.highestAcceptedId);
   state.proposingValue = payload.value;
 
   broadcast("proposingValue", {
@@ -154,6 +188,11 @@ addWorkerMessageHandler("proposalPromised", async (payload) => {
 });
 
 addWorkerMessageHandler("overwriteProposer", (payload) => {
+  // overwrite comes with a value that was already approved
+  if (state.acceptedValue === payload.acceptedValue) {
+    return;
+  }
+
   if (state.proposalPromisesReceived > 0) {
     state.status = "proposing";
     state.proposingId = payload.highestProposalId;
@@ -167,9 +206,10 @@ addWorkerMessageHandler("overwriteProposer", (payload) => {
   } else {
     state.status = "idle";
     state.acceptedValue = payload.acceptedValue;
-    state.highestProposalId = payload.highestProposalId;
+    state.highestAcceptedId = payload.highestProposalId;
     state.proposingId = null;
     state.proposingValue = null;
+    state.highestPromiseId = null;
   }
 });
 
@@ -182,7 +222,7 @@ addWorkerMessageHandler("acceptConfirmed", async (payload) => {
 
     if (state.acceptsReceived >= state.minimumQuorum) {
       state.status = "idle";
-      state.highestProposalId = state.proposingId;
+      state.highestAcceptedId = state.proposingId;
       state.acceptedValue = state.proposingValue;
       state.proposingId = null;
       state.proposingValue = null;

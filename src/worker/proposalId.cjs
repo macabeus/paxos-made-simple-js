@@ -25,4 +25,22 @@ const proposalIdIsHigherThan = (a, b) => {
   return false;
 };
 
-module.exports = { getNextProposalId, proposalIdIsHigherThan };
+const proposalIdHasSameIndex = (a, b) => {
+  const rawIncA = a.split(":")[1];
+  const rawIncB = b.split(":")[1];
+
+  const incA = Number(rawIncA);
+  const incB = Number(rawIncB);
+
+  if (incA === incB) {
+    return true;
+  }
+
+  return false;
+};
+
+module.exports = {
+  getNextProposalId,
+  proposalIdIsHigherThan,
+  proposalIdHasSameIndex,
+};
