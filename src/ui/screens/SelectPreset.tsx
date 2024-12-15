@@ -1,6 +1,6 @@
 import SelectInput from "ink-select-input";
 import { useWorkerPool } from "../hooks/useWorkerPool";
-import { presets } from "../../presets.cjs";
+import { presets, Preset } from "../../presets";
 import { usePreset } from "../hooks/usePreset";
 
 const presetItems = presets.map((item) => ({
@@ -15,10 +15,7 @@ export const SelectPreset = ({ onSelect }: Props) => {
   const { loadPreset } = usePreset();
   const { startWorker } = useWorkerPool();
 
-  const handleSelect = (item: {
-    label: string;
-    value: (typeof presets)[0];
-  }) => {
+  const handleSelect = (item: { label: string; value: Preset }) => {
     for (const worker of item.value.workers) {
       startWorker(
         worker.id,
