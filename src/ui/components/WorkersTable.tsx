@@ -1,10 +1,9 @@
 import { Text, Box } from "ink";
 import { ColoredText } from "./ColoredText";
+import { useWorkerPool } from "../hooks/useWorkerPool";
 
-type Props = {
-  workers: WorkerState[];
-};
-export const WorkersTable = ({ workers }: Props) => {
+export const WorkersTable = () => {
+  const { workers } = useWorkerPool();
   const sortedWorkers = workers.toSorted((a, b) => a.id.localeCompare(b.id));
 
   return (

@@ -1,10 +1,10 @@
 import { Text, Box } from "ink";
 import { ColoredText } from "./ColoredText";
+import { useLogs } from "../hooks/useLogs";
 
-type Props = {
-  logs: LogEntry[];
-};
-export const Logs = ({ logs }: Props) => {
+export const Logs = () => {
+  const { logs } = useLogs();
+
   return (
     <Box height={15} flexDirection="column">
       <Text bold>Logs</Text>
