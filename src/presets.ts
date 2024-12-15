@@ -40,7 +40,7 @@ export const presets: Preset[] = [
       { id: "worker2", delay: 1000 },
       { id: "worker3", delay: 2000 },
       { id: "worker4", delay: 4000 },
-      { id: "worker5", delay: 4000 },
+      { id: "worker5", delay: 5000 },
     ],
     command: "propose worker1 foo; propose worker2 bar; propose worker3 baaz",
   },

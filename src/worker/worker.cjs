@@ -99,7 +99,7 @@ addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
       sendResponse("overwriteProposer", {
         proposerId: payload.proposerId,
         highestProposalId: state.proposingId,
-        acceptedValue: state.proposingValue,
+        proposingValue: state.proposingValue,
       });
 
       // ...and it counts as a promise received
@@ -200,23 +200,40 @@ const sendAcceptsIfNeeded = () => {
 
 addWorkerMessageHandler("overwriteProposer", (payload) => {
   // overwrite comes with a value that was already approved
-  if (state.acceptedValue === payload.acceptedValue) {
+  if (
+    state.acceptedValue === (payload.proposingValue ?? payload.acceptedValue) ||
+    state.proposingValue === (payload.proposingValue ?? payload.acceptedValue)
+  ) {
     return;
   }
 
-  state.proposingId = payload.highestProposalId;
-  state.proposingValue = payload.acceptedValue;
+  // overwrite comes when it isn't proposing a value anymore
+  if (state.status !== "proposing" && state.status === "sendingAccepts") {
+    return;
+  }
 
   if (state.proposalPromisesReceived > 0) {
     state.status = "proposing";
+    state.proposingId = payload.highestProposalId;
+    state.proposingValue = payload.proposingValue ?? payload.acceptedValue;
 
     broadcast("proposingValue", {
       proposerId: payload.proposerId,
       proposalId: payload.highestProposalId,
       proposalValue: payload.acceptedValue,
     });
+  } else if (payload.acceptedValue) {
+    state.status = "idle";
+    state.acceptedValue = payload.acceptedValue;
+    state.highestAcceptedId = payload.highestProposalId;
+    state.proposingId = null;
+    state.proposingValue = null;
+    state.highestPromiseId = null;
   } else {
     state.status = "promiseSent";
+    state.proposingId = null;
+    state.proposingValue = null;
+    state.highestPromiseId = payload.highestProposalId;
   }
 });
 
