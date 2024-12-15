@@ -102,9 +102,10 @@ addBroadcastHandler("proposingValue", async (payload, { sendResponse }) => {
         acceptedValue: state.proposingValue,
       });
 
-      // ...and it counts as a promise and accept accepted
+      // ...and it counts as a promise received
       state.proposalPromisesReceived += 1;
-      state.acceptsReceived += 1;
+
+      sendAcceptsIfNeeded();
 
       return;
     } else {
@@ -178,18 +179,24 @@ addWorkerMessageHandler("proposalPromised", async (payload) => {
     state.proposingValue === payload.proposalValue
   ) {
     state.proposalPromisesReceived += 1;
-
-    if (state.proposalPromisesReceived >= state.minimumQuorum) {
-      state.status = "sendingAccepts";
-
-      broadcast("acceptResponse", {
-        proposerId: id,
-        proposalId: state.proposingId,
-        acceptedValue: state.proposingValue,
-      });
-    }
+    sendAcceptsIfNeeded();
   }
 });
+
+const sendAcceptsIfNeeded = () => {
+  if (
+    state.status === "proposing" &&
+    state.proposalPromisesReceived >= state.minimumQuorum
+  ) {
+    state.status = "sendingAccepts";
+
+    broadcast("acceptResponse", {
+      proposerId: id,
+      proposalId: state.proposingId,
+      acceptedValue: state.proposingValue,
+    });
+  }
+};
 
 addWorkerMessageHandler("overwriteProposer", (payload) => {
   // overwrite comes with a value that was already approved
@@ -197,10 +204,11 @@ addWorkerMessageHandler("overwriteProposer", (payload) => {
     return;
   }
 
+  state.proposingId = payload.highestProposalId;
+  state.proposingValue = payload.acceptedValue;
+
   if (state.proposalPromisesReceived > 0) {
     state.status = "proposing";
-    state.proposingId = payload.highestProposalId;
-    state.proposingValue = payload.acceptedValue;
 
     broadcast("proposingValue", {
       proposerId: payload.proposerId,
@@ -208,12 +216,7 @@ addWorkerMessageHandler("overwriteProposer", (payload) => {
       proposalValue: payload.acceptedValue,
     });
   } else {
-    state.status = "idle";
-    state.acceptedValue = payload.acceptedValue;
-    state.highestAcceptedId = payload.highestProposalId;
-    state.proposingId = null;
-    state.proposingValue = null;
-    state.highestPromiseId = null;
+    state.status = "promiseSent";
   }
 });
 
