@@ -121,7 +121,7 @@ export const CommandInput = ({ onSubmit }: Props) => {
   });
 
   return (
-    <Box borderStyle="round" borderColor="gray" width={181}>
+    <Box borderStyle="round" borderColor="gray" width={177}>
       {inputValue ? (
         <Text>{inputValue}</Text>
       ) : (

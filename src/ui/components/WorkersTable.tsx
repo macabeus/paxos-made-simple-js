@@ -7,7 +7,7 @@ export const WorkersTable = () => {
   const sortedWorkers = workers.toSorted((a, b) => a.id.localeCompare(b.id));
 
   return (
-    <Box flexDirection="column" width={200} height={10}>
+    <Box flexDirection="column" width={180} height={10}>
       <Box>
         <Box width="7%">
           <Text bold>ID</Text>
@@ -37,11 +37,11 @@ export const WorkersTable = () => {
           <Text bold>Proposing Value</Text>
         </Box>
 
-        <Box width="19%">
-          <Text bold>Promises Received / Min. Quorum</Text>
+        <Box width="15%">
+          <Text bold>Promises Received / MQ</Text>
         </Box>
 
-        <Box width="20%">
+        <Box width="15%">
           <Text bold>Accepts Received / MQ</Text>
         </Box>
       </Box>
@@ -76,13 +76,13 @@ export const WorkersTable = () => {
             <ColoredText value={worker.proposingValue} />
           </Box>
 
-          <Box width="19%">
+          <Box width="15%">
             <ColoredText value={worker.proposalPromisesReceived} />
             <Text>/</Text>
             <ColoredText value={worker.minimumQuorum} />
           </Box>
 
-          <Box width="20%">
+          <Box width="15%">
             <ColoredText value={worker.acceptsReceived} />
             <Text>/</Text>
             <ColoredText value={worker.minimumQuorum} />

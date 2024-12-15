@@ -80,7 +80,7 @@ export const Main = () => {
   };
 
   return (
-    <Box flexDirection="column" width={200}>
+    <Box flexDirection="column" width={180}>
       <WorkersTable />
 
       <Logs />
