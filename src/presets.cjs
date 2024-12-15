@@ -6,6 +6,7 @@ const presets = [
       { id: "worker2", delay: 4000 },
       { id: "worker3", delay: 6000 },
     ],
+    command: "propose worker1 foo",
   },
 ];
 

@@ -4,6 +4,7 @@ import { Main } from "./screens/Main";
 import { SelectPreset } from "./screens/SelectPreset";
 import { WorkerPoolProvider } from "./hooks/useWorkerPool";
 import { LogsProvider } from "./hooks/useLogs";
+import { PresetProvider } from "./hooks/usePreset";
 
 type Screen = "selectPreset" | "main";
 
@@ -27,7 +28,9 @@ process.on("exit", () => {
 render(
   <LogsProvider>
     <WorkerPoolProvider>
-      <Ui />
+      <PresetProvider>
+        <Ui />
+      </PresetProvider>
     </WorkerPoolProvider>
   </LogsProvider>
 );

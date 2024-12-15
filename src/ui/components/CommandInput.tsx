@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Text, Box, useInput } from "ink";
+import { usePreset } from "../hooks/usePreset";
 
 export type ParsedCommand =
   | { action: "invalid"; reason: string }
@@ -103,7 +104,8 @@ type Props = {
 };
 
 export const CommandInput = ({ onSubmit }: Props) => {
-  const [inputValue, setInputValue] = useState("");
+  const { defaultCommand } = usePreset();
+  const [inputValue, setInputValue] = useState(defaultCommand);
 
   useInput((input, key) => {
     if (key.delete) {
