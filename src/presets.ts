@@ -34,7 +34,18 @@ export const presets: Preset[] = [
     command: "propose worker1 foo; propose worker2 bar",
   },
   {
-    name: "Multiple proposes at the same time",
+    name: "Three proposes at the same time",
+    workers: [
+      { id: "worker1", delay: 1000 },
+      { id: "worker2", delay: 1000 },
+      { id: "worker3", delay: 1000 },
+      { id: "worker4", delay: 4000 },
+      { id: "worker5", delay: 5000 },
+    ],
+    command: "propose worker1 foo; propose worker2 bar; propose worker3 baaz",
+  },
+  {
+    name: "Multiple proposes running sequentially",
     workers: [
       { id: "worker1", delay: 5000 },
       { id: "worker2", delay: 1000 },
@@ -45,6 +56,16 @@ export const presets: Preset[] = [
     command: "propose worker1 foo; propose worker2 bar; propose worker3 baaz",
   },
   {
+    name: "Two proposes proposing the same value at the same time",
+    workers: [
+      { id: "worker1", delay: 1000 },
+      { id: "worker2", delay: 1000 },
+      { id: "worker3", delay: 3000 },
+      { id: "worker4", delay: 4000 },
+      { id: "worker5", delay: 5000 },
+    ],
+    command: "propose worker1 foo; propose worker2 foo",
+  },  {
     name: "Always without a majority",
     workers: [
       { id: "worker1", delay: 1000 },
