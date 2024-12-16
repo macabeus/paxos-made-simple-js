@@ -1,4 +1,5 @@
 const {
+  workerData,
   parentPort,
   threadId,
   BroadcastChannel,
@@ -6,8 +7,11 @@ const {
 } = require("node:worker_threads");
 const { delay } = require("./delay.cjs");
 
+const { id } = workerData;
+
 // broadcast
-const bc = new BroadcastChannel("bus");
+const busChannelName = id.includes("#") ? id.split("#")[0] : "bus";
+const bc = new BroadcastChannel(busChannelName);
 
 const broadcast = (type, payload) => {
   bc.postMessage({ type, originThreadId: threadId, payload });

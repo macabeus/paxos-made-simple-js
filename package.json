@@ -10,7 +10,8 @@
     "url": "https://github.com/macabeus/paxos-made-simple-js.git"
   },
   "scripts": {
-    "start": "tsx src/ui/ui.tsx"
+    "start": "tsx src/ui/ui.tsx",
+    "tests": "npx vitest"
   },
   "dependencies": {
     "ink": "^5.1.0",
@@ -23,6 +24,7 @@
     "@types/node": "^22.10.1",
     "@types/react": "18.x.x",
     "typescript": "^5.7.2",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
   }
 }

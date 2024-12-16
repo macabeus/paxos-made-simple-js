@@ -1,11 +1,11 @@
 import { Box } from "ink";
-import { useImmerReducer } from "use-immer";
-import { CommandInput, ParsedCommand } from "../components/CommandInput";
+import { CommandInput } from "../components/CommandInput";
 import { Logs } from "../components/Logs";
 import { WorkersTable } from "../components/WorkersTable";
 import { delay } from "../utils/helpers";
 import { useWorkerPool } from "../hooks/useWorkerPool";
 import { useLogs } from "../hooks/useLogs";
+import type { ParsedCommand } from "../utils/command";
 
 export const Main = () => {
   const { addRawLog, addRawLogs } = useLogs();

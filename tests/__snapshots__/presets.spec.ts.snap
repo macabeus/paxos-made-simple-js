@@ -1,0 +1,325 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`# Run Presets > Always without a majority 1`] = `
+{
+  "worker1": {
+    "acceptsReceived": 0,
+    "minimumQuorum": 2,
+    "proposingId": "Always without a majority#worker1:1",
+    "proposingValue": "foo",
+    "status": "proposing",
+  },
+  "worker2": {
+    "highestPromiseId": "Always without a majority#worker1:1",
+    "minimumQuorum": 2,
+    "status": "promiseSent",
+  },
+  "worker3": {
+    "minimumQuorum": 2,
+    "status": "off",
+  },
+  "worker4": {
+    "minimumQuorum": 2,
+    "status": "off",
+  },
+}
+`;
+
+exports[`# Run Presets > Multiple proposes running sequentially 1`] = `
+{
+  "worker1": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 2,
+    "highestAcceptedId": "Multiple proposes running sequentially#worker1:1",
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker2": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "Multiple proposes running sequentially#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker3": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "Multiple proposes running sequentially#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker4": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Multiple proposes running sequentially#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker5": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Multiple proposes running sequentially#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+}
+`;
+
+exports[`# Run Presets > No online majority initially 1`] = `
+{
+  "worker1": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 2,
+    "highestAcceptedId": "No online majority initially#worker1:1",
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker2": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "No online majority initially#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker3": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "No online majority initially#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker4": {
+    "minimumQuorum": 2,
+    "status": "off",
+  },
+}
+`;
+
+exports[`# Run Presets > Simple 1`] = `
+{
+  "worker1": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 1,
+    "highestAcceptedId": "Simple#worker1:1",
+    "minimumQuorum": 1,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker2": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Simple#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 1,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker3": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Simple#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 1,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+}
+`;
+
+exports[`# Run Presets > Three proposes at the same time 1`] = `
+{
+  "worker1": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 2,
+    "highestAcceptedId": "Three proposes at the same time#worker1:1",
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker2": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "Three proposes at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker3": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "Three proposes at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker4": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Three proposes at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker5": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Three proposes at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+}
+`;
+
+exports[`# Run Presets > Trying proposing with an obsoleted id 1`] = `
+{
+  "worker1": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 1,
+    "highestAcceptedId": "Trying proposing with an obsoleted id#worker1:1",
+    "minimumQuorum": 1,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker2": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Trying proposing with an obsoleted id#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 1,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker3": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "Trying proposing with an obsoleted id#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 1,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+}
+`;
+
+exports[`# Run Presets > Two proposes at the same time 1`] = `
+{
+  "worker1": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 2,
+    "highestAcceptedId": "Two proposes at the same time#worker1:1",
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker2": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "Two proposes at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker3": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Two proposes at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker4": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Two proposes at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+}
+`;
+
+exports[`# Run Presets > Two proposes proposing the same value at the same time 1`] = `
+{
+  "worker1": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 2,
+    "highestAcceptedId": "Two proposes proposing the same value at the same time#worker1:1",
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker2": {
+    "acceptedValue": "foo",
+    "acceptsReceived": 0,
+    "highestAcceptedId": "Two proposes proposing the same value at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker3": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Two proposes proposing the same value at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker4": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Two proposes proposing the same value at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+  "worker5": {
+    "acceptedValue": "foo",
+    "highestAcceptedId": "Two proposes proposing the same value at the same time#worker1:1",
+    "highestPromiseId": null,
+    "minimumQuorum": 2,
+    "proposingId": null,
+    "proposingValue": null,
+    "status": "idle",
+  },
+}
+`;
